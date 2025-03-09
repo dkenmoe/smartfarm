@@ -75,7 +75,7 @@ class HealthRecord(models.Model):
     def __str__(self):
         return f"Health Check {self.animal.breed.name} - {self.checkup_date}"
 
-class Resource(models.Model):
+class FeedingRecord(models.Model):
     """Tracks farm resources such as food, water, and medication"""
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=50, choices=[('food', 'Food'), ('water', 'Water'), ('medicine', 'Medicine')])
