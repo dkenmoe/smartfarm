@@ -1,17 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-class CustomUser(AbstractUser):
-    """Extends the User model to include roles"""
-    ROLE_CHOICES = [
-        ('general_manager', 'General Manager'),
-        ('production_manager', 'Production Manager'),
-        ('sales_manager', 'Sales Manager'),
-        ('employee', 'Employee')
-    ]
+class Role(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True, null=True)
     
-    role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='employee')
+    def __str__(self):
+        return self.name
 
+class CustomUser(AbstractUser):
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
+    
+    def has_role(self, role_name):
+        return self.role and self.role.name == role_name
     # Resolved the conflict by adding related_name
     groups = models.ManyToManyField(
         "auth.Group",
