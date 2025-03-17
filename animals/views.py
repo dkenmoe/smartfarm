@@ -12,7 +12,10 @@ from .serializers import (
 class AnimalTypeViewSet(viewsets.ModelViewSet):
     queryset = AnimalType.objects.all()
     serializer_class = AnimalTypeSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]    
+    
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user) 
 
 class AnimalBreedViewSet(viewsets.ModelViewSet):
     queryset = AnimalBreed.objects.all()

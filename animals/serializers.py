@@ -7,12 +7,14 @@ from .models import (
 class AnimalTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnimalType
-        fields = '__all__'
+        fields = ['id', 'name', 'created_by']
+        read_only_fields = ['created_by']
 
 class AnimalBreedSerializer(serializers.ModelSerializer):
     class Meta:
         model = AnimalBreed
-        fields = '__all__'
+        fields = ['id', 'name', 'animal_type', 'created_by']
+        read_only_fields = ['created_by']
 
 class AnimalGroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +24,8 @@ class AnimalGroupSerializer(serializers.ModelSerializer):
 class WeightCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = WeightCategory
-        fields = '__all__'
+        fields =  ['id', 'min_weight', 'max_weight', 'created_by']
+        read_only_fields = ['created_by']
 
 class BirthRecordSerializer(serializers.ModelSerializer):
     class Meta:
