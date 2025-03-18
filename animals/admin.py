@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AnimalType, AnimalBreed, WeightCategory, AnimalPrice, AnimalGroup, BirthRecord
+from .models import AnimalType, AnimalBreed, WeightCategory, AnimalPrice, AnimalGroup, BirthRecord, AnimalInventory, DiedRecord
 
 @admin.register(AnimalType)
 class AnimalTypeAdmin(admin.ModelAdmin):
@@ -15,13 +15,13 @@ class AnimalBreedAdmin(admin.ModelAdmin):
 
 @admin.register(WeightCategory)   
 class WeightCategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'min_weight', 'max_weight', 'created_by')
+    list_display = ('min_weight', 'max_weight', 'created_by')
     search_fields = ('min_weight', 'max_weight' )
     list_filter = ('created_by',)
     
 @admin.register(AnimalPrice)   
 class AnimalPriceAdmin(admin.ModelAdmin):
-    list_display = ('id', 'animal_type', 'weight_category', 'price', 'created_by')
+    list_display = ('id', 'animal_type', 'breed', 'gender', 'weight_category', 'price', 'created_by')
     search_fields = ('name',)
     list_filter = ('created_by', )
     
@@ -36,3 +36,15 @@ class BirthRecordAdmin(admin.ModelAdmin):
     list_display = ('id', 'animal_type', 'breed', 'gender', 'weight_category', 'quantity', 'date_of_birth', 'created_by')
     search_fields = ('animal_type', 'breed', 'gender', 'weight_category', 'quantity', 'date_of_birth', )
     list_filter = ('animal_type', 'breed', 'gender', 'weight_category', 'quantity', 'date_of_birth', )
+
+@admin.register(AnimalInventory)   
+class AnimalInventoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'animal_type', 'breed', 'gender', 'weight_category', 'quantity')
+    search_fields = ('animal_type', 'breed', 'gender', 'weight_category', 'quantity',)
+    list_filter = ('animal_type', 'breed', 'gender', 'weight_category', 'quantity', )
+
+@admin.register(DiedRecord)   
+class DiedRecordAdmin(admin.ModelAdmin):
+    list_display = ('id', 'animal_type', 'breed', 'gender', 'weight_category', 'quantity', 'date_of_death', 'created_by')
+    search_fields = ('animal_type', 'breed', 'gender', 'weight_category', 'quantity',)
+    list_filter = ('animal_type', 'breed', 'gender', 'weight_category', 'quantity', )

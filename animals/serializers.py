@@ -31,6 +31,18 @@ class BirthRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = BirthRecord
         fields = '__all__'
+    
+    def validate(self, data):
+        """
+        Ensure that the breed belongs to the selected animal type.
+        """
+        animal_type = data.get('animal_type')
+        breed = data.get('breed')
+
+        if breed and animal_type and breed.animal_type != animal_type:
+            raise serializers.ValidationError("The selected breed does not belong to the specified animal type.")
+
+        return data
 
 class HealthRecordSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -61,8 +62,19 @@ class BirthRecord(models.Model):
     date_of_birth = models.DateField(auto_now_add=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
+    def clean(self):
+        """
+        Ensure that the selected breed belongs to the selected animal_type.
+        """
+        if self.breed.animal_type != self.animal_type:
+            raise ValidationError("The selected breed does not belong to the specified animal type.")
+
+    def save(self, *args, **kwargs):
+        self.clean()  # Call clean() before saving
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"Birth {self.parent_animal.breed.name} ({self.birth_date})"
+        return f"{self.quantity} {self.animal_type} ({self.breed}) born on {self.date_of_birth}"
 
 class HealthRecord(models.Model):
     """Tracks the health status of animals"""
@@ -88,11 +100,24 @@ class FeedingRecord(models.Model):
 class AnimalPrice(models.Model):
     animal_type = models.ForeignKey(AnimalType, on_delete=models.CASCADE, related_name="prices")
     weight_category = models.ForeignKey(WeightCategory, on_delete=models.CASCADE, related_name="prices")
+    breed = models.ForeignKey(AnimalBreed, on_delete=models.CASCADE,related_name='prices')
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    gender = models.CharField(max_length=10, choices=[("Male", "Male"), ("Female", "Female")])
     created_by = models.DateField(auto_now_add=True)
     
     class Meta:
         unique_together = ('animal_type', 'weight_category')
+    
+    def clean(self):
+        """
+        Ensure that the selected breed belongs to the selected animal_type.
+        """
+        if self.breed.animal_type != self.animal_type:
+            raise ValidationError("The selected breed does not belong to the specified animal type.")
+
+    def save(self, *args, **kwargs):
+        self.clean() 
+        super().save(*args, **kwargs)
         
     def __str__(self):
         return f"{self.animal_type.name} ({self.weight_category}) - ${self.price}"
