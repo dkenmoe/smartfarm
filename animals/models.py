@@ -27,6 +27,20 @@ class WeightCategory(models.Model):
     max_weight = models.FloatField()
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     
+    class Meta:
+        unique_together = ('min_weight', 'max_weight')
+    
+    def clean(self):
+        super().clean()        
+        if(self.min_weight < 0 or self.max_weight < 0):
+            raise ValidationError("Weights cannot be negative.")
+        if(self.min_weight >= self.max_weight):
+            raise ValidationError("Max weight must be greater than min weight.")
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super().save(*args, **kwargs)
+    
     def __str__(self):
         return f"{self.min_weight}-{self.max_weight} kg"
 
@@ -63,9 +77,7 @@ class BirthRecord(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     def clean(self):
-        """
-        Ensure that the selected breed belongs to the selected animal_type.
-        """
+        super().clean()
         if self.breed.animal_type != self.animal_type:
             raise ValidationError("The selected breed does not belong to the specified animal type.")
 
@@ -109,9 +121,7 @@ class AnimalPrice(models.Model):
         unique_together = ('animal_type', 'weight_category')
     
     def clean(self):
-        """
-        Ensure that the selected breed belongs to the selected animal_type.
-        """
+        super().clean()
         if self.breed.animal_type != self.animal_type:
             raise ValidationError("The selected breed does not belong to the specified animal type.")
 

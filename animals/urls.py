@@ -4,6 +4,7 @@ from .views import (
     AnimalTypeViewSet, AnimalBreedViewSet, AnimalGroupViewSet, WeightCategoryViewSet,
     BirthRecordViewSet, HealthRecordViewSet, FeedingRecordViewSet
 )
+from .views_statistics import GlobalStatisticsView
 
 router = DefaultRouter()
 router.register(r'animal-types', AnimalTypeViewSet)
@@ -16,4 +17,5 @@ router.register(r'feeding-records', FeedingRecordViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('statistics/global/', GlobalStatisticsView.as_view(), name='global_statistics'),
 ]
