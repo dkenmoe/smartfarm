@@ -17,7 +17,7 @@ class BaseRoleViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsAuthenticatedAndHasRole()]
-        return [IsAuthenticated()]
+        return [IsAuthenticated]
 
 # User Registration View
 class RoleViewSet(BaseRoleViewSet):
@@ -43,7 +43,7 @@ class AddressViewSet(BaseRoleViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated()]
+    permission_classes = [IsAuthenticated]
 
 class RegisterAPIView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -51,21 +51,21 @@ class RegisterAPIView(generics.CreateAPIView):
 
 class ProfileAPIView(generics.RetrieveUpdateAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated()]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return self.request.user
 
 class AdminDashboardAPIView(generics.ListAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated()]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return get_user_model().objects.all()
 
 class UserListAPIView(generics.ListAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated()]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return get_user_model().objects.all()

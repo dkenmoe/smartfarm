@@ -8,6 +8,9 @@ class IsAuthenticatedAndHasRole(BasePermission):
     """
     
     def has_permission(self, request, view):
+        if(request.user.is_superuser):
+            return True
+        
         required_role = getattr(view, 'required_role', None)
         
         if not request.user.is_authenticated:

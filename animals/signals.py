@@ -3,7 +3,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import AnimalInventory, BirthRecord, DiedRecord
 
-# 🟢 Automatically Increase Inventory on Birth
 @receiver(post_save, sender=BirthRecord)
 def increase_animal_inventory(sender, instance, created, **kwargs):
     if created:
@@ -18,7 +17,6 @@ def increase_animal_inventory(sender, instance, created, **kwargs):
             inventory.quantity += instance.quantity
             inventory.save()
 
-# 🔴 Automatically Decrease Inventory on Death
 @receiver(post_save, sender=DiedRecord)
 def decrease_animal_inventory(sender, instance, created, **kwargs):
     if created:

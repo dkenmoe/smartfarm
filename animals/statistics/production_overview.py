@@ -3,7 +3,7 @@ from animals.models import BirthRecord, DiedRecord, AnimalInventory
 
 def get_production_overview():
     total_births = BirthRecord.objects.aggregate(total=Sum('quantity'))['total'] or 0
-    total_deaths = DiedRecord.objects.aaggregate(total=Sum('quantity'))['total'] or 0
+    total_deaths = DiedRecord.objects.aggregate(total=Sum('quantity'))['total'] or 0
     total_inventory = AnimalInventory.objects.aggregate(total=Sum('quantity'))['total'] or 0
     mortality_rate = (total_deaths / total_births) if total_births > 0 else 0
     

@@ -4,11 +4,15 @@ from django.contrib.auth import get_user_model
 from .models import Role, Country, City, Address
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        data["username"] = self.user.username
-        data["email"] = self.user.email
-        return data
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # Add custom claims
+        token['username'] = user.username
+        token['email'] = user.email
+        token['roles'] = list(user.groups.values_list('name', flat=True))
+
+        return token
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
