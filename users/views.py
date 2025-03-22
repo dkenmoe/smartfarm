@@ -1,38 +1,71 @@
-from django.contrib.auth.models import User
-from rest_framework import generics, permissions, viewsets
-from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser
+from rest_framework import generics, viewsets, permissions
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsAuthenticatedAndHasRole
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer, CustomTokenObtainPairSerializer
-from .models import Role
-from .serializers import RoleSerializer
+from django.contrib.auth import get_user_model
+from .models import Role, Country, City, Address
+from .serializers import RoleSerializer, CountrySerializer, CitySerializer, AddressSerializer
 
-# ✅ 1️⃣ Custom Login View (Overrides JWT Token View)
+# Custom Login View (Overrides JWT Token View)
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    
+class BaseRoleViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticatedAndHasRole]
 
-# ✅ 2️⃣ User Registration View
-class RegisterUserView(generics.CreateAPIView):
-    queryset = User.objects.all()
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAuthenticatedAndHasRole()]
+        return [IsAuthenticated()]
+
+# User Registration View
+class RoleViewSet(BaseRoleViewSet):
+    queryset = Role.objects.all()
+    serializer_class = RoleSerializer
+    required_role = 'admin'
+
+class CountryViewSet(BaseRoleViewSet):
+    queryset = Country.objects.all()
+    serializer_class = CountrySerializer
+    required_role = 'admin'
+
+class CityViewSet(BaseRoleViewSet):
+    queryset = City.objects.all()
+    serializer_class = CitySerializer
+    required_role = 'admin'
+
+class AddressViewSet(BaseRoleViewSet):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+    required_role = 'admin'
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = get_user_model().objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated()]
+
+class RegisterAPIView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
-# ✅ 3️⃣ Logout View (Blacklist Token)
-class LogoutView(generics.GenericAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+class ProfileAPIView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated()]
 
-    def post(self, request):
-        try:
-            refresh_token = request.data["refresh"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()  # Blacklist the token so it can’t be reused
-            return Response({"message": "Successfully logged out."}, status=200)
-        except Exception as e:
-            return Response({"error": "Invalid token"}, status=400)
+    def get_object(self):
+        return self.request.user
 
-class RoleViewSet(viewsets.ModelViewSet):
-    queryset = Role.objects.all()
-    serializer_class = RoleSerializer
-    permission_classes = [IsAdminUser]
+class AdminDashboardAPIView(generics.ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated()]
 
+    def get_queryset(self):
+        return get_user_model().objects.all()
+
+class UserListAPIView(generics.ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated()]
+
+    def get_queryset(self):
+        return get_user_model().objects.all()

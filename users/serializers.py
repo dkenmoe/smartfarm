@@ -1,9 +1,8 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import Role
+from django.contrib.auth import get_user_model
+from .models import Role, Country, City, Address
 
-# ✅ Custom Token Serializer (to include extra user details in JWT response)
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
@@ -11,18 +10,36 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data["email"] = self.user.email
         return data
 
-# ✅ User Registration Serializer
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
-
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
-    
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
-        fields = '__all_'
+        fields = '__all__'
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = '__all__'
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = '__all__'
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = '__all__'
+
+class UserSerializer(serializers.ModelSerializer):
+    roles = RoleSerializer(many=True, read_only=True)
+    address = AddressSerializer(read_only=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'username', 'email', 'phone_number', 'profile_picture', 'roles', 'address')
+    
+    def create(self, validated_data):
+        user = super().create(validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user

@@ -8,11 +8,17 @@ from .serializers import (
     AnimalTypeSerializer, AnimalBreedSerializer, AnimalGroupSerializer, WeightCategorySerializer,
     BirthRecordSerializer, HealthRecordSerializer, FeedingRecordSerializer
 )
+from users.permissions import IsAuthenticatedAndHasRole
 
 class AnimalTypeViewSet(viewsets.ModelViewSet):
     queryset = AnimalType.objects.all()
     serializer_class = AnimalTypeSerializer
-    permission_classes = [IsAuthenticated]    
+    
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAuthenticatedAndHasRole()]
+        return [IsAuthenticated()]
+    required_role = 'production_manager' 
     
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user) 

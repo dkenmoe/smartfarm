@@ -11,6 +11,13 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+# Add media URL to URLs in development
+from django.conf import settings
+from django.conf.urls.static import static
+import os
+
+# if settings.DEBUG:
+#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -48,7 +55,17 @@ INSTALLED_APPS = [
     # Packages tiers (ex: DRF, JWT)
     'rest_framework',
     'rest_framework_simplejwt',
+    
+    # For handling image uploads
+    # 'sorl.thumbnail',
 ]
+
+# Specify the custom auth user model
+AUTH_USER_MODEL = 'users.CustomUser'
+
+# Configure media files for profile pictures
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
