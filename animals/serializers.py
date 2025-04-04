@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import (
-    AnimalType, AnimalBreed, AnimalGroup, WeightCategory,
+    AnimalInventory, AnimalType, AnimalBreed, AnimalGroup, WeightCategory,
     BirthRecord, HealthRecord, FeedingRecord
 )
 
@@ -28,9 +28,20 @@ class WeightCategorySerializer(serializers.ModelSerializer):
         read_only_fields = ['created_by']
 
 class BirthRecordSerializer(serializers.ModelSerializer):
+    animal_type = serializers.PrimaryKeyRelatedField(queryset=AnimalType.objects.all())
+    breed = serializers.PrimaryKeyRelatedField(queryset=AnimalBreed.objects.all())
+    weight_category = serializers.PrimaryKeyRelatedField(queryset=WeightCategory.objects.all())
+    
+    animal_type_name = serializers.CharField(source='animal_type.name', read_only=True)
+    breed_name = serializers.CharField(source='breed.name', read_only=True)
+    weight_category_display = serializers.SerializerMethodField()
     class Meta:
         model = BirthRecord
-        fields = '__all__'
+        fields = ['id', 'animal_type', 'animal_type_name', 'breed', 'breed_name', 'gender',
+                 'weight_category', 'weight_category_display', 'quantity', 'date_of_birth', 'created_by']
+    
+    def get_weight_category_display(self, obj):
+        return f"{obj.weight_category.min_weight}-{obj.weight_category.max_weight} kg"
     
     def validate(self, data):
         """
@@ -53,3 +64,21 @@ class FeedingRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeedingRecord
         fields = '__all__'
+        
+class AnimalInventorySerializer(serializers.ModelSerializer):
+    animal_type = serializers.PrimaryKeyRelatedField(queryset=AnimalType.objects.all())
+    breed = serializers.PrimaryKeyRelatedField(queryset=AnimalBreed.objects.all())
+    weight_category = serializers.PrimaryKeyRelatedField(queryset=WeightCategory.objects.all())
+    
+    # Des champs supplémentaires pour afficher les noms
+    animal_type_name = serializers.CharField(source='animal_type.name', read_only=True)
+    breed_name = serializers.CharField(source='breed.name', read_only=True)
+    weight_category_display = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = AnimalInventory
+        fields = ['id', 'animal_type', 'animal_type_name', 'breed', 'breed_name', 
+                 'gender', 'weight_category', 'weight_category_display', 'quantity']
+    
+    def get_weight_category_display(self, obj):
+        return f"{obj.weight_category.min_weight} - {obj.weight_category.max_weight} kg"

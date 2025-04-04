@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
-    AnimalTypeViewSet, AnimalBreedViewSet, AnimalGroupViewSet, WeightCategoryViewSet,
+    AnimalInventoryViewSet, AnimalTypeViewSet, AnimalBreedViewSet, AnimalGroupViewSet, WeightCategoryViewSet,
     BirthRecordViewSet, HealthRecordViewSet, FeedingRecordViewSet
 )
 from .views_statistics import GlobalStatisticsView
@@ -14,6 +14,7 @@ router.register(r'weight-categories', WeightCategoryViewSet)
 router.register(r'birth-records', BirthRecordViewSet)
 router.register(r'health-records', HealthRecordViewSet)
 router.register(r'feeding-records', FeedingRecordViewSet)
+router.register(r'animal-inventories', AnimalInventoryViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

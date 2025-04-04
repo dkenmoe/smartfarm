@@ -32,7 +32,13 @@ SECRET_KEY = 'django-insecure-fpve2*&2sz!ma9iu7$l##h^z+w9+void5w7dqy@syka#xjt1*j
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '10.0.2.2',  # This is important for Android emulator access
+    '10.0.2.3',  # host's first interface (usually the LAN)
+    '10.0.2.15', # the emulated device itself
+]
 
 
 # Application definition
@@ -58,6 +64,8 @@ INSTALLED_APPS = [
     
     # For handling image uploads
     # 'sorl.thumbnail',
+    
+    'corsheaders',
 ]
 
 # Specify the custom auth user model
@@ -95,6 +103,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # This must come before any middleware that might return responses
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'smartfarm.urls'
@@ -169,3 +179,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+# Allow all methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
